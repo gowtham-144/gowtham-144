@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    input[type="text"] {
+      width: calc(100% - 80px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .recipe {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .recipe h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .recipe img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .loading {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Recipe Finder</h1>
+    <div>
+      <input type="text" id="ingredients" placeholder="Enter ingredients separated by commas">
+      <button onclick="searchRecipes()">Search</button>
+    </div>
+    <div id="results"></div>
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+    <div id="error" class="loading" style="display: none; color: red;"></div>
+  </div>
+
+  <script>
+    function searchRecipes() {
+      const ingredients = document.getElementById('ingredients').value.trim();
+      if (!ingredients) {
+        showError('Please enter at least one ingredient.');
+        return;
+      }
+
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('error').style.display = 'none';
+
+      const apiKey = '995c138f27e74f11ad58f60e4bc506b9';
+      const apiUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredients}&apiKey=${apiKey}`;
+
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok.');
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('loading').style.display = 'none';
+
+          data.forEach(recipe => {
+            const recipeDiv = document.createElement('div');
+            recipeDiv.classList.add('recipe');
+            recipeDiv.innerHTML = `
+              <h2>${recipe.title}</h2>
+              <img src="${recipe.image}" alt="${recipe.title}">
+              <p>Missing Ingredients: ${recipe.missedIngredientCount}</p>
+              <p><a href="${recipe.sourceUrl}" target="_blank">View Recipe</a></p>
+            `;
+            resultsContainer.appendChild(recipeDiv);
+          });
+        })
+        .catch(error => {
+          document.getElementById('loading').style.display = 'none';
+          showError('An error occurred while fetching recipes.');
+        });
+    }
+
+    function showError(message) {
+      document.getElementById('error').innerText = message;
+      document.getElementById('error').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+
