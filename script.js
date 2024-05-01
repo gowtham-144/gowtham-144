@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch food recipes from the API
     const fetchRecipes = async () => {
         try {
-            const response = await fetch(`https://api.spoonacular.com/recipes/complexSearch`);
+            const response = await fetch(https://api.spoonacular.com/recipes/search?query=${query}&apiKey=${apiKey}`);
             const data = await response.json();
             return data;
         } catch (error) {
